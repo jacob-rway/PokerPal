@@ -144,7 +144,7 @@ int main()
     bool exit = false;
     float potAmount = 0.0f;
 
-    while (playerList.size() > 1 || !exit)
+    while (playerList.size() > 1 && !exit)
     {
 
         printPlayers(playerList);
