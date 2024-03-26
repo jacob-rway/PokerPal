@@ -296,7 +296,6 @@ int main()
 
     while (playerList.size() > 1 && !exit)
     {
-
         printPlayers();
         printMenu();
 
@@ -312,8 +311,9 @@ int main()
             Player newPlayer;
             newPlayer.name = newPlrName;
             playerList.push_back(newPlayer);
+        	playerListChanged = true;
 
-            playerListChanged = true;
+			std::cout << std::endl;
             break;
         }
 
@@ -332,6 +332,7 @@ int main()
                 playerListChanged = true;
             }
 
+			std::cout << std::endl;	
             break;
         }
 
@@ -373,6 +374,7 @@ int main()
                 printChipAmounts(player);
             }
 
+			std::cout << std::endl;
             break;
         }
 
@@ -388,6 +390,8 @@ int main()
 
                 totalWinnings += playerWinnings;
             }
+
+			std::cout << std::endl;
 
             if (potAmount == 0)
             {
@@ -409,6 +413,8 @@ int main()
             }
 
             std::cout << "Total pot amount: $" << potAmount << std::endl;
+
+			std::cout << std::endl;
             break;
         }
 
@@ -426,8 +432,7 @@ int main()
             {
                 potAmount = (playerList.size() - 1) * 10.25f;
 
-                std::cout << "Pot set to $" << potAmount << std::endl;
-                break;
+                break;    
             }
 
             case 2:
@@ -443,11 +448,12 @@ int main()
                     std::cin >> potAmount;
                 }
 
-                std::cout << "Pot set to $" << potAmount << std::endl;
                 break;
             }
             }
 
+            std::cout << "Pot set to $" << potAmount << std::endl;
+        	std::cout << std::endl;	
             break;
         }
 
