@@ -285,8 +285,8 @@ void printChipAmounts(const Player& player)
 
 int main()
 {
-    std::cout << std::fixed;
-    std::cout << std::setprecision(2); // set floating point precision
+    std::cout << std::fixed << std::setprecision(2); // set floating point precision
+    std::cerr << std::fixed << std::setprecision(2); // set floating point precision
 
     bool exit = false;
     float potAmount = 0.0f;
