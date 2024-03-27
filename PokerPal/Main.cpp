@@ -4,284 +4,7 @@
 #include <limits>
 #include <string>
 #include <vector>
-// ReSharper disable All
-
-const float WHITE_CHIP_VALUE = 0.01f;
-const float RED_CHIP_VALUE = 0.05f;
-const float BLUE_CHIP_VALUE = 0.10f;
-const float GREEN_CHIP_VALUE = 0.25f;
-const float BLACK_CHIP_VALUE = 1.00f;
-const std::string CHIP_COLORS[] = { "white", "red", "blue", "green", "black" };
-
-enum IntInputValidationOptions { MAIN_MENU, ENTER_CHIP_AMOUNTS, SET_POT };
-
-enum StrInputValidationOptions { ADD_PLAYER, REMOVE_PLAYER, EDIT_PLAYER_CHIPS };
-
-struct Player
-{
-    std::string name;
-    int whiteChips;
-    int redChips;
-    int blueChips;
-    int greenChips;
-    int blackChips;
-
-    Player()
-        : name("NONE"), whiteChips(0), redChips(0), blueChips(0), greenChips(0),
-        blackChips(0)
-    {
-    }
-};
-
-std::vector<Player> loadPlayerList();
-std::vector<Player> playerList = loadPlayerList();
-
-std::vector<Player> loadPlayerList()
-{
-    std::ifstream inFile("players.txt");
-    std::vector<Player> players;
-    players.push_back(Player()); // default player, used for error handling
-
-    if (!inFile.is_open())
-    {
-        std::cerr << "ERROR: Missing 'players.txt' file!" << std::endl;
-    }
-    else
-    {
-        std::string line;
-
-        while (std::getline(inFile, line))
-        {
-            Player player;
-            player.name = line;
-            players.push_back(player);
-        }
-
-        inFile.close();
-    }
-
-    return players;
-}
-
-float calculateWinnings(const Player& player)
-{
-    float winnings = 0;
-    winnings += player.whiteChips * WHITE_CHIP_VALUE;
-    winnings += player.redChips * RED_CHIP_VALUE;
-    winnings += player.blueChips * BLUE_CHIP_VALUE;
-    winnings += player.greenChips * GREEN_CHIP_VALUE;
-    winnings += player.blackChips * BLACK_CHIP_VALUE;
-
-    return winnings;
-}
-
-Player getPlayer(const std::string& name)
-{
-    for (int i = 1; i < playerList.size(); i++)
-    {
-        if (playerList[i].name == name && playerList[i].name != "NONE")
-        {
-            return playerList[i];
-        }
-    }
-
-    std::cerr << "ERROR: Player '" << name << "' not found!" << std::endl;
-    return playerList[0];
-}
-
-int getPlayerIndex(const std::string& name)
-{
-    for (int i = 1; i < playerList.size(); i++)
-    {
-        if (playerList[i].name == name && playerList[i].name != "NONE")
-        {
-            return i;
-        }
-    }
-
-    std::cerr << "ERROR: Player '" << name << "' not found!" << std::endl;
-    return -1;
-}
-
-Player& getPlayerReference(const std::string& name)
-{
-    for (Player& player : playerList)
-    {
-        if (player.name == name && player.name != "NONE")
-        {
-            return player;
-        }
-    }
-
-    std::cerr << "ERROR: Player '" + name + "' not found!" << std::endl;
-    return playerList[0];
-}
-
-bool playerExists(const std::string& name)
-{
-    for (int i = 1; i < playerList.size(); i++)
-    {
-        if (playerList[i].name == name)
-        {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-void printMenu()
-{
-    std::cout << "Choose an option:" << std::endl;
-    std::cout << "1. Add a Player" << std::endl;
-    std::cout << "2. Remove a Player" << std::endl;
-    std::cout << "3. Enter Player Chip Amounts" << std::endl;
-    std::cout << "4. Print Player Winnings" << std::endl;
-    std::cout << "5. Set Pot" << std::endl;
-    std::cout << "6. Exit & Save Player List" << std::endl;
-}
-
-void printPlayers()
-{
-    std::cout << playerList.size() - 1 << " currently loaded players: ";
-    for (int i = 1; i < playerList.size(); i++)
-    {
-        if (i < playerList.size() - 1)
-        {
-            std::cout << playerList[i].name << ", ";
-        }
-        else
-        {
-            std::cout << playerList[i].name << std::endl << std::endl;
-        }
-    }
-}
-
-void printBanner()
-{
-    std::cout << "***********************************************" << std::endl;
-    std::cout << "          POKER PAL by JACOB RIDGEWAY          " << std::endl;
-    std::cout << "     A command-line based poker game tool.     " << std::endl;
-    std::cout << "               Developed 3/25/24               " << std::endl;
-    std::cout << "***********************************************" << std::endl;
-    std::cout << std::endl;
-}
-
-int getIntegerInput(enum IntInputValidationOptions option)
-{
-    switch (option)
-    {
-    case MAIN_MENU:
-    {
-        int input;
-        std::cin >> input;
-        std::cout << std::endl;
-
-        while (std::cin.fail() || input <= 0 || input > 6)
-        {
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            std::cerr << "ERROR: Please enter a valid menu option: ";
-            std::cin >> input;
-        }
-
-        return input;
-    }
-
-    case ENTER_CHIP_AMOUNTS:
-    {
-        int input;
-        std::cin >> input;
-
-        while (std::cin.fail() || input < 0)
-        {
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            std::cerr
-                << "ERROR: Invalid amount! Enter a valid number of chips: ";
-            std::cin >> input;
-        }
-
-        return input;
-    }
-
-    case SET_POT:
-    {
-        int input;
-        std::cin >> input;
-
-        while (std::cin.fail() || (input != 1 && input != 2))
-        {
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            std::cerr << "ERROR: Please enter a valid menu option: ";
-            std::cin >> input;
-        }
-
-        return input;
-    }
-    }
-}
-
-std::string getStringInput(enum StrInputValidationOptions option)
-{
-    switch (option)
-    {
-    case ADD_PLAYER:
-    {
-        std::string input;
-        std::cin >> input;
-
-        while (input == "NONE" || playerExists(input))
-        {
-            std::cerr << "ERROR: Name is not allowed or taken! Please enter a "
-                "different name: ";
-            std::cin >> input;
-        }
-
-        return input;
-    }
-
-    case REMOVE_PLAYER:
-    {
-        std::string input;
-        std::cin >> input;
-
-        while (!playerExists(input))
-        {
-            std::cerr << "ERROR: Player not found! Please enter a valid name: ";
-            std::cin >> input;
-        }
-
-        return input;
-    }
-
-    case EDIT_PLAYER_CHIPS:
-    {
-        std::string input;
-        std::cin >> input;
-
-        while (!playerExists(input))
-        {
-            std::cerr << "ERROR: Player not found! Please enter a valid name: ";
-            std::cin >> input;
-        }
-
-        return input;
-    }
-    }
-}
-
-void printChipAmounts(const Player& player)
-{
-    std::cout << "Total chip amounts for " << player.name << ": "
-        << std::endl;
-    std::cout << "White: " << player.whiteChips << " - $" << (player.whiteChips * WHITE_CHIP_VALUE) << std::endl;
-    std::cout << "Red: " << player.redChips << " - $" << (player.redChips * RED_CHIP_VALUE) << std::endl;
-    std::cout << "Blue: " << player.blueChips << " - $" << (player.blueChips * BLUE_CHIP_VALUE) << std::endl;
-    std::cout << "Green: " << player.greenChips << " - $" << (player.greenChips * GREEN_CHIP_VALUE) << std::endl;
-    std::cout << "Black: " << player.blackChips << " - $" << (player.blackChips * BLACK_CHIP_VALUE) << std::endl;
-}
+#include "PokerPal.h"
 
 int main()
 {
@@ -313,7 +36,7 @@ int main()
             playerList.push_back(newPlayer);
         	playerListChanged = true;
 
-			std::cout << std::endl;
+			std::cout << '\n';
             break;
         }
 
@@ -324,7 +47,7 @@ int main()
 
             if (playerList.size() == 2)
             { // must account for NONE player at index 0, hence the 2
-                std::cerr << "ERROR: Must be at least one player!" << std::endl;
+                std::cerr << "ERROR: Must be at least one player!" << '\n';
             }
             else
             {
@@ -332,7 +55,7 @@ int main()
                 playerListChanged = true;
             }
 
-			std::cout << std::endl;	
+			std::cout << '\n';	
             break;
         }
 
@@ -370,11 +93,11 @@ int main()
                     }
                 }
 
-                std::cout << std::endl;
+                std::cout << '\n';
                 printChipAmounts(player);
             }
 
-			std::cout << std::endl;
+			std::cout << '\n';
             break;
         }
 
@@ -386,43 +109,43 @@ int main()
             {
                 Player player = playerList[i];
                 float playerWinnings = calculateWinnings(player);
-                std::cout << player.name << ": $" << playerWinnings << std::endl;
+                std::cout << player.name << ": $" << playerWinnings << '\n';
 
                 totalWinnings += playerWinnings;
             }
 
-			std::cout << std::endl;
+			std::cout << '\n';
 
             if (potAmount == 0)
             {
-                std::cerr << "WARNING: No pot amount is currently set." << std::endl;
+                std::cerr << "WARNING: No pot amount is currently set." << '\n';
             }
             else if (potAmount < totalWinnings)
             {
                 float difference = totalWinnings - potAmount;
                 std::cerr << "WARNING: Total winnings exceed the pot amount by $"
                     << difference << "! Ensure chips haven't been overcounted."
-                    << std::endl;
+                    << '\n';
             }
             else if (potAmount > totalWinnings)
             {
                 float difference = potAmount - totalWinnings;
                 std::cerr << "WARNING: Total winnings are less than the pot amount by $"
                     << difference << "! Ensure chips haven't been undercounted."
-                    << std::endl;
+                    << '\n';
             }
 
-            std::cout << "Total pot amount: $" << potAmount << std::endl;
+            std::cout << "Total pot amount: $" << potAmount << '\n';
 
-			std::cout << std::endl;
+			std::cout << '\n';
             break;
         }
 
         case 5: // Set pot amount
         {
-            std::cout << "Choose an option for setting the pot." << std::endl;
-            std::cout << "1. Default - Multiplies the number of players by 10.25." << std::endl;
-            std::cout << "2. Custom - Specify a custom amount." << std::endl;
+            std::cout << "Choose an option for setting the pot." << '\n';
+            std::cout << "1. Default - Multiplies the number of players by 10.25." << '\n';
+            std::cout << "2. Custom - Specify a custom amount." << '\n';
 
             int potChoice = getIntegerInput(SET_POT);
 
@@ -452,8 +175,8 @@ int main()
             }
             }
 
-            std::cout << "Pot set to $" << potAmount << std::endl;
-        	std::cout << std::endl;	
+            std::cout << "Pot set to $" << potAmount << '\n';
+        	std::cout << '\n';	
             break;
         }
 
@@ -473,7 +196,7 @@ int main()
                     }
                     else
                     {
-                        outFile << std::endl << playerList[i].name;
+                        outFile << '\n' << playerList[i].name;
                     }
                 }
             }
